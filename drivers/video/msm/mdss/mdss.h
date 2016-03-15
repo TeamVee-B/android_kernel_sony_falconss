@@ -148,6 +148,7 @@ struct mdss_data_type {
 
 	struct mdss_fudge_factor ab_factor;
 	struct mdss_fudge_factor ib_factor;
+	struct mdss_fudge_factor ib_factor_overlap;
 	struct mdss_fudge_factor clk_factor;
 
 	struct mdss_hw_settings *hw_settings;
@@ -193,6 +194,7 @@ struct mdss_data_type {
 	int handoff_pending;
 	struct mdss_prefill_data prefill_data;
 	bool ulps;
+	int iommu_ref_cnt;
 };
 extern struct mdss_data_type *mdss_res;
 
@@ -216,6 +218,7 @@ void mdss_enable_irq(struct mdss_hw *hw);
 void mdss_disable_irq(struct mdss_hw *hw);
 void mdss_disable_irq_nosync(struct mdss_hw *hw);
 void mdss_bus_bandwidth_ctrl(int enable);
+int mdss_iommu_ctrl(int enable);
 
 static inline struct ion_client *mdss_get_ionclient(void)
 {
