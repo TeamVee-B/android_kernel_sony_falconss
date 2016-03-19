@@ -13,39 +13,11 @@
 # Main Process - Start
 
 maindevice() {
-clear
-echo "-${bldgrn}Device choice${txtrst}-"
 echo
-bname=$name
-bvariant=$variant
-bdefconfig=$defconfig
-unset name variant defconfig
-echo "${bldred}Xperia E1${txtrst}"
-echo "0) Single"
-echo "1) Dual"
-echo "2) TV"
-echo
-echo "e) Exit"
-echo
-read -p "Choice: " -n 1 -s x
-case "$x" in
-	0 ) variant="Single";;
-	1 ) variant="Dual";;
-	2 ) variant="TV";;
-	e ) ;;
-	* ) ops;;
-esac
-if [ "$variant" == "" ]; then
-	name=$bname
-	variant=$bvariant
-	defconfig=$bdefconfig
-	unset bname bvariant bdefconfig
-else
-	defconfig="cyanogenmod_falconss_defconfig"
-	name="XperiaE1"
-	make $defconfig &> /dev/null | echo "$x - $name $variant, setting..."
-	unset buildprocesscheck zippackagecheck defconfigcheck
-fi
+defconfig="cyanogenmod_falconss_defconfig"
+name="XperiaE1"
+make $defconfig &> /dev/null | echo "$x - $name, setting..."
+unset buildprocesscheck zippackagecheck defconfigcheck
 }
 
 maintoolchain() {
@@ -139,14 +111,13 @@ if [ -f .config ]; then
 	echo "1) Default Linux Kernel format  | Small"
 	echo "2) Usual copy of .config format | Complete"
 	echo
-	echo "e) Exit"
+	echo "*) Any other key to Exit"
 	echo
 	read -p "Choice: " -n 1 -s x
 	case "$x" in
 		1 ) echo "Wait..."; make savedefconfig &>/dev/null; mv defconfig arch/$ARCH/configs/$defconfig;;
 		2 ) cp .config arch/$ARCH/configs/$defconfig;;
-		e ) ;;
-		* ) ops;;
+		* ) ;;
 	esac
 else
 	ops
@@ -169,7 +140,6 @@ if ! [ "$defconfig" == "" ]; then
 		mkdir $zipdirout/ramdisk/
 
 		cp -r zip-creator/ramdisk/base-ramdisk/* $zipdirout/ramdisk/
-		cp -r zip-creator/ramdisk/$variant-ramdisk/* $zipdirout/ramdisk/
 
 		cd $zipdirout/ramdisk/
 		find . | cpio -o -H newc | gzip > ../../$zipdirout/tempramdisk
@@ -195,7 +165,6 @@ if ! [ "$defconfig" == "" ]; then
 		rm -rf $zipdirout/tempramdisk
 
 		echo "${name}" >> $zipdirout/device.prop
-		echo "${variant}" >> $zipdirout/device.prop
 		echo "${release}" >> $zipdirout/device.prop
 
 		mkdir $zipdirout/modules
@@ -231,14 +200,13 @@ if [ -f zip-creator/$zipfile ]; then
 	echo "i) For Internal"
 	echo "e) For External"
 	echo
-	echo "q) Exit"
+	echo "*) Any other key to Exit"
 	echo
 	read -p "Choice: " -n 1 -s x
 	case "$x" in
 		i ) echo "Coping to Internal Card..."; adb shell rm -rf /storage/sdcard0/$zipfile &> /dev/null; adb push zip-creator/$zipfile /storage/sdcard0/$zipfile &> /dev/null;;
 		e ) echo "Coping to External Card..."; adb shell rm -rf /storage/sdcard1/$zipfile &> /dev/null; adb push zip-creator/$zipfile /storage/sdcard1/$zipfile &> /dev/null;;
-		q ) ;;
-		* ) ops;;
+		* ) ;;
 	esac
 else
 	ops
@@ -257,7 +225,7 @@ echo "-${bldred}Clean${txtrst}-"
 echo "1) Zip Packages | ${bldred}$cleanzipcheck${txtrst}"
 echo "2) Kernel       | ${bldred}$cleankernelcheck${txtrst}"
 echo "-${bldgrn}Main Process${txtrst}-"
-echo "3) Device Choice    | ${bldgrn}$name $variant${txtrst}"
+echo "3) Device Choice    | ${bldgrn}$name${txtrst}"
 echo "4) Toolchain Choice | ${bldgrn}$ToolchainCompile${txtrst}"
 echo "-${bldyel}Build Process${txtrst}-"
 echo "5) Build Kernel      | ${bldyel}$buildprocesscheck${txtrst}"
@@ -280,7 +248,7 @@ echo
 read -n 1 -p "${txtbld}Choice: ${txtrst}" -s x
 case $x in
 	1) echo "$x - Cleaning Zips"; rm -rf zip-creator/*.zip; unset zippackagecheck;;
-	2) echo "$x - Cleaning Kernel"; make clean mrproper &> /dev/null; unset buildprocesscheck name variant defconfig BUILDTIME;;
+	2) echo "$x - Cleaning Kernel"; make clean mrproper &> /dev/null; unset buildprocesscheck name defconfig BUILDTIME;;
 	3) maindevice;;
 	4) maintoolchain;;
 	5) buildprocess;;
@@ -369,7 +337,7 @@ elif [ -e build.sh ]; then
 		kernelsublevel=`cat Makefile | grep SUBLEVEL | cut -c 12- | head -1`
 		kernelname=`cat Makefile | grep NAME | cut -c 8- | head -1`
 		release=$(date +%d""%m""%Y)
-		zipfile="$customkernel-$name-$variant-$release-$build.zip"
+		export zipfile="$customkernel-$name-$release-$build.zip"
 
 		buildsh
 	done
