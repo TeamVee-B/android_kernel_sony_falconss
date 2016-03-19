@@ -247,14 +247,14 @@ echo "q) Quit"
 echo
 read -n 1 -p "${txtbld}Choice: ${txtrst}" -s x
 case $x in
-	1) echo "$x - Cleaning Zips"; rm -rf zip-creator/*.zip; unset zippackagecheck;;
+	# 1) echo "$x - Cleaning Zips"; rm -rf zip-creator/*.zip; unset zippackagecheck;;
 	2) echo "$x - Cleaning Kernel"; make clean mrproper &> /dev/null; unset buildprocesscheck name defconfig BUILDTIME;;
 	3) maindevice;;
 	4) maintoolchain;;
 	5) buildprocess;;
-	6) zippackage;;
+	# 6) zippackage;;
 	7) updatedefconfig;;
-	8) adbcopy;;
+	# 8) adbcopy;;
 	9) echo "$x - Rebooting to Recovery..."; adb reboot recovery;;
 	o) if [ "$buildoutput" == "OFF" ]; then unset buildoutput; else buildoutput="OFF"; fi;;
 	q) echo "$x - Ok, Bye!"; break;;
@@ -338,6 +338,11 @@ elif [ -e build.sh ]; then
 		kernelname=`cat Makefile | grep NAME | cut -c 8- | head -1`
 		release=$(date +%d""%m""%Y)
 		export zipfile="$customkernel-$name-$release-$build.zip"
+
+		# Disable ZIP Build, for not make troubles
+		zipcopycheck="NOT AVAILABLE, Sorry"
+		zippackagecheck="NOT AVAILABLE, Sorry"
+		cleanzipcheck="NOT AVAILABLE, Sorry"
 
 		buildsh
 	done
